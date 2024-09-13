@@ -22,7 +22,7 @@ Example TOTP usage with default values:
     u = OTPAuth.totp_uri(s, "My Issuer Name", "Some Label")
 
 - Verify a TOTP code "c" from the user:
-    if c == OTPAuth.totp(s)
+    if c == OTPAuth.totp(s)[0]
        puts "Ok"
     else
       puts "Not ok"

@@ -37,6 +37,7 @@ module OTPAuth
   end
 
   # Generate a TOTP code at this time. (RFC6238)
+  # Returns two values, the code and the time remaining in the period
   def self.totp(b32secret,
                 period = DEFAULT_TOTP_PERIOD,
                 digits = DEFAULT_DIGITS,
@@ -45,16 +46,18 @@ module OTPAuth
   end
 
   # Generate a TOTP code at a specific Unix timestamp t seconds.
+  # Returns two values, the code and the time remaining in the period
   def self.totp_at(t, b32secret,
                    period = DEFAULT_TOTP_PERIOD,
                    digits = DEFAULT_DIGITS,
                    algorithm = DEFAULT_ALGORITHM)
-    hotp(t/period, b32secret, digits, algorithm)
+    c,r = t.divmod(period)
+    return hotp(c, b32secret, digits, algorithm), period-r
   end
 
 
   # Generate a Base32 encoded secret. (RFC4648 p.6)
-  # Minimum 16 (128 bits), redommended 20 (160 bits), or larger
+  # Minimum 16 (128 bits), recommended 20 (160 bits), or larger
   def self.generate_secret(bytes)
     s = Base32.encode(OpenSSL::Random.random_bytes(bytes))
     s.delete!('=')              # We don't need padding
